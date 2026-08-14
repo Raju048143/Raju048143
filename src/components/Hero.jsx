@@ -276,7 +276,7 @@ export default function Hero() {
 
             {/* Image */}
             <img
-              src="/photo.png"
+              src={`${import.meta.env.BASE_URL}photo.png`}
               alt="Raju Yadav — Full Stack Developer"
               className="relative w-28 h-28 md:w-32 md:h-32 rounded-full object-cover z-20 border-2 border-transparent shadow-2xl transition-transform duration-500 group-hover:scale-105"
             />
@@ -340,8 +340,7 @@ export default function Hero() {
             View My Work
           </button>
           <a
-            href="/Raju_Yadav_Resume.pdf"
-            download="Raju_Yadav_Resume.pdf"
+            href={`${import.meta.env.BASE_URL}Raju_Yadav_Resume.pdf`}
             className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-teal-50 border border-teal-200 text-teal-700 dark:bg-teal-500/10 dark:border-teal-500/30 dark:text-teal-400 hover:-translate-y-0.5"
           >
             <Download size={16} />

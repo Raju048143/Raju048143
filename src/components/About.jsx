@@ -51,7 +51,7 @@ export default function About() {
                 <div className="absolute -inset-6 rounded-full opacity-30 pointer-events-none"
                   style={{ background: "radial-gradient(circle, rgba(99,102,241,0.4), transparent 70%)", filter: "blur(20px)" }} />
                 <img
-                  src="/photo.png"
+                  src={`${import.meta.env.BASE_URL}photo.png`}
                   alt="Raju Yadav"
                   className="relative w-56 h-56 rounded-2xl object-cover shadow-2xl"
                 />
@@ -143,8 +143,7 @@ export default function About() {
             {/* Resume CTA */}
             <div className="flex items-center gap-4">
               <a
-                href="/Raju_Yadav_Resume.pdf"
-                download="Raju_Yadav_Resume.pdf"
+                href={`${import.meta.env.BASE_URL}Raju_Yadav_Resume.pdf`}
                 className="btn-primary"
               >
                 <Download size={16} />
