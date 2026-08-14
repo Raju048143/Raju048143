@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle, Loader, AlertCircle } from "lucide-react";
 import emailjs from "@emailjs/browser";
+import useScrollReveal from "../hooks/useScrollReveal";
 
 // ── EmailJS config (set in .env) ──────────────────────────────
 const SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -61,14 +62,15 @@ const faqs = [
     a: "Currently employed at Radoms Digital with flexible hours. Open to consulting and select freelance projects.",
   },
   {
-    q: "What's your budget range?",
-    a: "I work with startups to enterprises. Pricing is flexible and based on project scope, complexity, and timeline.",
+    q: "What's your typical project scope?",
+    a: "From REST APIs and admin panels to full-stack platforms. Pricing is flexible based on project complexity and timeline.",
   },
 ];
 
 // ── Component ─────────────────────────────────────────────────
 export default function Contact() {
   const formRef = useRef(null);
+  const sectionRef = useScrollReveal();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -113,7 +115,7 @@ export default function Contact() {
     <div className="section-padding relative bg-indigo-50/50 dark:bg-indigo-500/5">
       <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto relative">
+      <div ref={sectionRef} className="max-w-6xl mx-auto relative reveal">
         {/* ── Header ── */}
         <div className="mb-16 text-center">
           <p className="section-subtitle mb-3">Let's Talk</p>
@@ -121,7 +123,7 @@ export default function Contact() {
             Get In <span className="gradient-text-static">Touch</span>
           </h2>
           <p className="text-slate-500 dark:text-zinc-500 mt-4 max-w-xl mx-auto text-sm leading-relaxed">
-            Have a project in mind or just want to chat? Feel free to reach out. I'm always open to new opportunities.
+            Have a project in mind or just want to connect? I'm always open to discussing new opportunities and collaborations.
           </p>
           <div
             className="h-px w-24 mx-auto mt-6"
@@ -171,7 +173,8 @@ export default function Contact() {
             className="lg:col-span-3 p-8 rounded-2xl glass border border-slate-200 dark:border-white/10"
           >
             <h3
-              className="text-slate-900 dark:text-white font-bold text-xl mb-6 font-space-grotesk"
+              className="text-slate-900 dark:text-white font-bold text-xl mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               Send a Message
             </h3>
@@ -260,7 +263,7 @@ export default function Contact() {
                   className="flex items-center gap-3 p-4 rounded-xl text-sm font-medium bg-emerald-50 border border-emerald-200 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400"
                 >
                   <CheckCircle size={18} />
-                  Message sent! I'll get back to you within 24 hours.
+                  Message sent successfully! I'll get back to you within 24 hours.
                 </div>
               )}
 

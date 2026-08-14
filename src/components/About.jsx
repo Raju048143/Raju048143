@@ -1,23 +1,26 @@
 import { Download, ArrowRight, MapPin, Mail, Phone, Sparkles } from "lucide-react";
+import useScrollReveal from "../hooks/useScrollReveal";
 
 const stats = [
-  { value: "4+", label: "Projects Completed", color: "#818cf8" },
-  { value: "2+", label: "Years Experience", color: "#34d399" },
-  { value: "100%", label: "Client Satisfaction", color: "#c084fc" },
+  { value: "6+", label: "Live Projects", color: "#818cf8" },
+  { value: "6K+", label: "Users Served", color: "#34d399" },
+  { value: "250+", label: "APIs Built", color: "#c084fc" },
   { value: "15+", label: "Tech Skills", color: "#38bdf8" },
 ];
 
-const frontendTech = ["React", "Next.js", "Tailwind", "JavaScript"];
-const backendTech = ["Node.js", "Express", "MongoDB", "Redis"];
-const toolsTech = ["Git", "AWS", "Docker", "CI/CD", "PM2"];
+const frontendTech = ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Bootstrap"];
+const backendTech = ["Node.js", "Express.js", "MongoDB", "PostgreSQL", "Redis"];
+const toolsTech = ["Git", "AWS EC2", "CI/CD", "PM2", "Hostinger VPS"];
 
 export default function About() {
+  const sectionRef = useScrollReveal();
+
   return (
     <div className="section-padding relative bg-indigo-50/50 dark:bg-indigo-500/5">
       {/* Background decoration */}
       <div className="absolute inset-0 dot-pattern opacity-30 pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto relative">
+      <div ref={sectionRef} className="max-w-6xl mx-auto relative reveal">
         {/* Section Header */}
         <div className="mb-16 text-center">
           <p className="section-subtitle mb-3">Who I Am</p>
@@ -99,14 +102,16 @@ export default function About() {
                 Full Stack Software Developer
               </h3>
               <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">
-                I'm a passionate Full Stack Software Developer with hands-on experience building{" "}
-                <span style={{ color: "#818cf8" }}>production-grade MERN stack applications</span>. I specialize
-                in React.js, Next.js, Node.js, MongoDB, Redis, and AWS deployments.
+                I'm a Full-Stack Developer (MERN) with 1+ year of experience building and shipping{" "}
+                <span style={{ color: "#818cf8" }}>production-grade APIs and interfaces</span> serving{" "}
+                <strong>6,000+ users</strong> across multiple live platforms. Proficient in crafting responsive
+                frontends with React.js, Next.js, TypeScript, and Tailwind CSS.
               </p>
               <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">
-                I've worked on complex internal systems, financial platforms, and marketplace applications—fixing
-                critical bugs and improving performance under real traffic. My focus is on writing{" "}
-                <span style={{ color: "#34d399" }}>clean, scalable code</span> that delivers real results.
+                On the backend, I engineer scalable systems with Node.js, Express.js, MongoDB, PostgreSQL, and Redis.
+                Strong focus on{" "}
+                <span style={{ color: "#34d399" }}>RESTful API design, role-based access control, performance optimization</span>,
+                and CI/CD-driven deployments on AWS EC2.
               </p>
             </div>
 
@@ -121,7 +126,7 @@ export default function About() {
                 {[
                   { label: "Frontend", techs: frontendTech, className: "tag-indigo" },
                   { label: "Backend", techs: backendTech, className: "tag-teal" },
-                  { label: "Tools & DevOps", techs: toolsTech, className: "tag-purple" },
+                  { label: "DevOps & Tools", techs: toolsTech, className: "tag-purple" },
                 ].map(({ label, techs, className }) => (
                   <div key={label}>
                     <p className="text-xs text-slate-500 dark:text-zinc-500 mb-2 font-medium uppercase tracking-wider">{label}</p>

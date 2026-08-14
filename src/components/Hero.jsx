@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Github, Linkedin, Mail, ChevronDown, Download } from "lucide-react";
 
 const ROLES = [
   "Full Stack Developer",
   "MERN Stack Engineer",
   "Backend Architect",
-  "React.js Expert",
+  "React.js Specialist",
 ];
 
 function useTypewriter(words, speed = 100, pause = 1800) {
@@ -38,25 +38,14 @@ function useTypewriter(words, speed = 100, pause = 1800) {
   return text;
 }
 
-// Floating particle component
-function Particle({ style }) {
-  return (
-    <div
-      className="absolute rounded-full pointer-events-none"
-      style={style}
-    />
-  );
-}
-
-export default function Hero() {
-  const typedRole = useTypewriter(ROLES);
-  const canvasRef = useRef(null);
-
-  // Animated grid
+// ── Interactive Particle Network ──
+function ParticleNetwork({ canvasRef }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    let animId;
+    let mouse = { x: -1000, y: -1000 };
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -65,68 +54,217 @@ export default function Hero() {
     resize();
     window.addEventListener("resize", resize);
 
-    let frame;
-    let t = 0;
+    const handleMouse = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+    window.addEventListener("mousemove", handleMouse);
+
+    // Particles
+    const count = Math.min(80, Math.floor(window.innerWidth / 18));
+    const particles = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 0.5,
+      color: ["rgba(99,102,241,", "rgba(20,184,166,", "rgba(168,85,247,"][Math.floor(Math.random() * 3)],
+    }));
+
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const gridSize = 80;
-      const cols = Math.ceil(canvas.width / gridSize);
-      const rows = Math.ceil(canvas.height / gridSize);
 
-      for (let x = 0; x <= cols; x++) {
-        for (let y = 0; y <= rows; y++) {
-          const posX = x * gridSize;
-          const posY = y * gridSize;
-          const dist = Math.sqrt(
-            Math.pow(posX - canvas.width / 2, 2) +
-              Math.pow(posY - canvas.height / 2, 2)
-          );
-          const alpha =
-            Math.max(0, 1 - dist / (canvas.width * 0.6)) *
-            (0.04 + 0.02 * Math.sin(t * 0.01 + dist * 0.005));
-          ctx.fillStyle = `rgba(99,102,241,${alpha})`;
-          ctx.beginPath();
-          ctx.arc(posX, posY, 1, 0, Math.PI * 2);
-          ctx.fill();
+      // Detect theme for opacity adjustments
+      const isDark = document.documentElement.classList.contains("dark");
+      const dotAlpha = isDark ? 0.6 : 0.85;
+      const lineAlphaMultiplier = isDark ? 0.15 : 0.4;
+      const lineWidth = isDark ? 0.5 : 1;
+      const dotScale = isDark ? 1 : 1.3;
+
+      // Update & draw particles
+      for (const p of particles) {
+        // Subtle mouse repulsion
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          const force = (150 - dist) / 150 * 0.8;
+          p.vx += (dx / dist) * force * 0.05;
+          p.vy += (dy / dist) * force * 0.05;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Dampen velocity
+        p.vx *= 0.998;
+        p.vy *= 0.998;
+
+        // Wrap edges
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * dotScale, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + dotAlpha + ")";
+        ctx.fill();
+      }
+
+      // Draw connections
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 160) {
+            const alpha = (1 - d / 160) * lineAlphaMultiplier;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = isDark ? `rgba(99,102,241,${alpha})` : `rgba(79,70,229,${alpha})`;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+          }
         }
       }
-      t++;
-      frame = requestAnimationFrame(draw);
+
+      animId = requestAnimationFrame(draw);
     };
     draw();
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
 
-  const particles = [
-    { width: 300, height: 300, top: "10%", left: "5%", background: "radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%)", filter: "blur(40px)", animation: "float 7s ease-in-out infinite" },
-    { width: 400, height: 400, top: "60%", right: "5%", background: "radial-gradient(circle, rgba(20,184,166,0.15), transparent 70%)", filter: "blur(50px)", animation: "float-slow 9s ease-in-out infinite" },
-    { width: 200, height: 200, top: "30%", right: "20%", background: "radial-gradient(circle, rgba(168,85,247,0.12), transparent 70%)", filter: "blur(30px)", animation: "float 5s ease-in-out infinite 2s" },
-  ];
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouse);
+    };
+  }, [canvasRef]);
+
+  return null;
+}
+
+export default function Hero() {
+  const typedRole = useTypewriter(ROLES);
+  const canvasRef = useRef(null);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Animated dot canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.6 }} />
 
-      {/* Glow orbs */}
-      {particles.map((p, i) => (
-        <Particle key={i} style={{ position: "absolute", ...p }} />
-      ))}
+      {/* ── Layer 1: Animated mesh gradient background ── */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Primary aurora blobs — stronger in light mode */}
+        <div
+          className="absolute w-[600px] h-[600px] rounded-full opacity-50 dark:opacity-20"
+          style={{
+            top: "-10%",
+            left: "-10%",
+            background: "radial-gradient(circle, rgba(99,102,241,0.6), transparent 70%)",
+            filter: "blur(80px)",
+            animation: "float-slow 12s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full opacity-40 dark:opacity-15"
+          style={{
+            top: "50%",
+            right: "-5%",
+            background: "radial-gradient(circle, rgba(20,184,166,0.6), transparent 70%)",
+            filter: "blur(80px)",
+            animation: "float 10s ease-in-out infinite 2s",
+          }}
+        />
+        <div
+          className="absolute w-[400px] h-[400px] rounded-full opacity-35 dark:opacity-15"
+          style={{
+            bottom: "-5%",
+            left: "30%",
+            background: "radial-gradient(circle, rgba(168,85,247,0.5), transparent 70%)",
+            filter: "blur(70px)",
+            animation: "float-slow 14s ease-in-out infinite 4s",
+          }}
+        />
 
-      {/* Radial vignette */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, transparent 30%, var(--bg-main) 90%)" }} />
+        {/* Rotating gradient ring */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-[0.12] dark:opacity-[0.05]"
+          style={{
+            background: "conic-gradient(from 0deg, #6366f1, #14b8a6, #a855f7, #6366f1)",
+            animation: "rotate-slow 20s linear infinite",
+            filter: "blur(60px)",
+          }}
+        />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 text-center" style={{ paddingTop: "5rem" }}>
+        {/* Floating geometric shapes */}
+        <div
+          className="absolute opacity-[0.15] dark:opacity-[0.04]"
+          style={{
+            top: "15%",
+            right: "15%",
+            width: 120,
+            height: 120,
+            border: "2px solid #6366f1",
+            borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%",
+            animation: "float 8s ease-in-out infinite, rotate-slow 15s linear infinite",
+          }}
+        />
+        <div
+          className="absolute opacity-[0.15] dark:opacity-[0.04]"
+          style={{
+            bottom: "20%",
+            left: "10%",
+            width: 80,
+            height: 80,
+            border: "2px solid #14b8a6",
+            borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
+            animation: "float-slow 10s ease-in-out infinite 3s, rotate-slow 12s linear infinite reverse",
+          }}
+        />
+        <div
+          className="absolute opacity-[0.12] dark:opacity-[0.03]"
+          style={{
+            top: "60%",
+            right: "25%",
+            width: 60,
+            height: 60,
+            border: "1.5px solid #a855f7",
+            transform: "rotate(45deg)",
+            animation: "float 6s ease-in-out infinite 1s",
+          }}
+        />
+
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
+      </div>
+
+      {/* ── Layer 2: Interactive particle network ── */}
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-[1]" style={{ opacity: 0.7 }} />
+      <ParticleNetwork canvasRef={canvasRef} />
+
+      {/* ── Layer 3: Soft edge blend (light touch, no heavy darkening) ── */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[2]"
+        style={{ background: "radial-gradient(ellipse at center, transparent 60%, rgba(248,250,252,0.4) 100%)" }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none z-[2] hidden dark:block"
+        style={{ background: "radial-gradient(ellipse at center, transparent 60%, rgba(6,6,17,0.4) 100%)" }}
+      />
+
+      {/* ── Layer 4: Content ── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 text-center hero-enter" style={{ paddingTop: "5rem" }}>
         {/* Profile Image */}
         <div className="relative flex justify-center mb-8">
           <div className="relative group">
             {/* Animated rotating border */}
-            <div 
+            <div
               className="absolute -inset-1.5 rounded-full opacity-70 group-hover:opacity-100 transition-opacity duration-500"
               style={{
                 background: "conic-gradient(from 0deg, #6366f1, #14b8a6, #c084fc, #6366f1)",
@@ -135,14 +273,14 @@ export default function Hero() {
             />
             {/* Inner mask */}
             <div className="absolute inset-0.5 rounded-full bg-slate-50 dark:bg-[#060611] z-10" />
-            
+
             {/* Image */}
-            <img 
-              src="/photo.png" 
-              alt="Raju Yadav" 
+            <img
+              src="/photo.png"
+              alt="Raju Yadav — Full Stack Developer"
               className="relative w-28 h-28 md:w-32 md:h-32 rounded-full object-cover z-20 border-2 border-transparent shadow-2xl transition-transform duration-500 group-hover:scale-105"
             />
-            
+
             {/* Floating indicator */}
             <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-slate-50 dark:border-[#060611] rounded-full z-30 animate-pulse" />
           </div>
@@ -178,9 +316,9 @@ export default function Hero() {
         <p className="text-slate-600 dark:text-zinc-400 text-lg max-w-2xl mx-auto leading-relaxed mb-10">
           Building{" "}
           <span style={{ color: "#818cf8" }}>scalable MERN stack applications</span>{" "}
-          with production-grade code. Specialized in React.js, Node.js, MongoDB,
-          and AWS. Passionate about{" "}
-          <span style={{ color: "#34d399" }}>solving complex challenges</span>.
+          serving <strong>6,000+ users</strong> across multiple live platforms. Specialized in React.js, Node.js, MongoDB,
+          and AWS deployments. Passionate about{" "}
+          <span style={{ color: "#34d399" }}>clean, production-grade code</span>.
         </p>
 
         {/* CTA Row */}
@@ -204,7 +342,7 @@ export default function Hero() {
           <a
             href="/Raju_Yadav_Resume.pdf"
             download="Raju_Yadav_Resume.pdf"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-teal-50 border border-teal-200 text-teal-700 dark:bg-teal-500/10 dark:border-teal-500/30 dark:text-teal-400"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-teal-50 border border-teal-200 text-teal-700 dark:bg-teal-500/10 dark:border-teal-500/30 dark:text-teal-400 hover:-translate-y-0.5"
           >
             <Download size={16} />
             Resume
@@ -214,7 +352,7 @@ export default function Hero() {
         {/* Social Icons */}
         <div className="flex gap-4 justify-center mb-16">
           {[
-            { href: "https://github.com", icon: Github, label: "GitHub", color: "#818cf8" },
+            { href: "https://github.com/Raju048143", icon: Github, label: "GitHub", color: "#818cf8" },
             { href: "https://www.linkedin.com/in/raju-yadav-946b16229/", icon: Linkedin, label: "LinkedIn", color: "#2dd4bf" },
             { href: "mailto:rajuyadav91391@gmail.com", icon: Mail, label: "Email", color: "#c084fc" },
           ].map(({ href, icon: Icon, label, color }) => (
@@ -224,7 +362,7 @@ export default function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               title={label}
-              className="group relative w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 bg-slate-100 border border-slate-200 dark:bg-white/5 dark:border-white/10"
+              className="group relative w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 bg-slate-100 border border-slate-200 dark:bg-white/5 dark:border-white/10 hover:-translate-y-1"
             >
               <Icon
                 size={20}
@@ -244,9 +382,9 @@ export default function Hero() {
         {/* Stats Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-px mb-14">
           {[
-            { value: "4+", label: "Projects" },
-            { value: "2+", label: "Years Exp" },
-            { value: "100%", label: "Committed" },
+            { value: "6+", label: "Live Projects" },
+            { value: "6K+", label: "Users Served" },
+            { value: "250+", label: "APIs Built" },
             { value: "15+", label: "Tech Skills" },
           ].map(({ value, label }, i) => (
             <div key={i} className="flex items-center">
@@ -262,7 +400,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
         style={{ animation: "float 2s ease-in-out infinite" }}
       >
         <span className="text-xs text-zinc-600 tracking-widest uppercase">Scroll</span>

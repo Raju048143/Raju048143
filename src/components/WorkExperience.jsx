@@ -1,4 +1,6 @@
-import { Briefcase, Calendar, MapPin, GraduationCap, Award } from "lucide-react";
+import { Briefcase, Calendar, MapPin, GraduationCap, Award, ChevronDown, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import useScrollReveal from "../hooks/useScrollReveal";
 
 const experiences = [
   {
@@ -9,8 +11,52 @@ const experiences = [
     period: "May 2025 – Present",
     current: true,
     description:
-      "Developing production-grade MERN applications, managing AWS EC2 & Hostinger VPS deployments with CI/CD pipelines.",
-    highlights: ["MERN Stack", "AWS Deployment", "CI/CD", "Performance Optimization"],
+      "Building and shipping production-grade MERN applications serving 6,000+ users, managing AWS EC2 & Hostinger VPS deployments with CI/CD pipelines.",
+    projects: [
+      {
+        name: "Achideal — E-Commerce Platform",
+        url: "https://achideal.com",
+        role: "Full Stack",
+        bullets: [
+          "Architected 250+ RESTful APIs for authentication, product catalog, order processing, vendor operations, and notifications (Node.js, MongoDB).",
+          "Built a comprehensive Admin Portal from the ground up (Next.js, TypeScript, Tailwind CSS) for centralized platform management.",
+          "Engineered coupon code and referral systems, driving user acquisition and promotional campaigns.",
+          "Developed product import/export pipelines and warehouse inventory management modules.",
+          "Implemented Role-Based Access Control (RBAC), audit logging, and content moderation workflows.",
+        ],
+      },
+      {
+        name: "LMS — Learning Management System",
+        url: "https://halatechqtr.com",
+        role: "Full Stack",
+        bullets: [
+          "Designed, built, and shipped a full-stack LMS serving 300+ active users with course management, enrolment, and progress-tracking.",
+          "Developed secure RESTful APIs for authentication, role-based course access, and user lifecycle management.",
+          "Created responsive dashboards for students and administrators, prioritizing intuitive navigation.",
+        ],
+      },
+      {
+        name: "LitConnect — Writer-Publisher Platform",
+        url: "https://litconnect.net",
+        role: "Backend",
+        bullets: [
+          "Refactored core business logic in the offer management system serving 1,000+ users, eliminating data inconsistencies across 25+ APIs.",
+          "Implemented Firebase Cloud Messaging from scratch across web and mobile platforms.",
+          "Designed environment-scoped test-user APIs to facilitate safe QA testing without impacting production data.",
+        ],
+      },
+      {
+        name: "EscPlan — Inventory Management Middleware",
+        url: "https://myescplan.com",
+        role: "Full Stack",
+        bullets: [
+          "Designed and built a real-time inventory synchronization engine between Shopify and internal platforms, serving 5,000+ users across 3 warehouses.",
+          "Integrated Shopify Inventory APIs to validate stock availability and maintain consistency across multiple warehouse nodes.",
+          "Built RESTful APIs for real-time inventory validation, out-of-stock handling, and dynamic EDD calculations.",
+        ],
+      },
+    ],
+    highlights: ["MERN Stack", "AWS Deployment", "CI/CD", "250+ APIs", "6K+ Users"],
     accent: "#6366f1",
   },
   {
@@ -21,8 +67,9 @@ const experiences = [
     period: "Feb 2025 – Apr 2025",
     current: false,
     description:
-      "Worked on Magento-based modules, fixed and enhanced Google Address Autofill and LMS modules for improved user experience.",
-    highlights: ["Magento", "Module Development", "Bug Fixing", "Performance Enhancement"],
+      "Developed and enhanced custom Magento 2 modules, including Google Address Autofill and LMS integrations. Owned the complete module lifecycle — from requirement gathering to deployment.",
+    projects: [],
+    highlights: ["Magento 2", "Module Development", "End-to-End Delivery", "Architecture Fluency"],
     accent: "#14b8a6",
   },
 ];
@@ -60,10 +107,65 @@ const certifications = [
   { name: "IR4.0 Foundation", color: "#c084fc", bgClass: "bg-purple-50 dark:bg-purple-500/5", borderClass: "border-purple-200 dark:border-purple-500/20", hoverClass: "hover:bg-purple-100 dark:hover:bg-purple-500/10 hover:border-purple-300 dark:hover:border-purple-500/40" },
 ];
 
+const achievements = [
+  "Solved 500+ rated problems on GeeksforGeeks and LeetCode — strong DSA proficiency.",
+  "Consistently delivered multiple full-stack projects to clients on schedule and within scope.",
+  "Secured 1st place at a hackathon organized by IIMT Greater Noida (December 2022).",
+];
+
+function ProjectDropdown({ project }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden transition-all duration-300">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left transition-colors duration-200 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-sm font-semibold text-slate-800 dark:text-white truncate">{project.name}</span>
+          <span className="tag-indigo text-[10px] flex-shrink-0">{project.role}</span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-indigo-500 hover:text-indigo-400 transition-colors"
+            >
+              <ExternalLink size={13} />
+            </a>
+          )}
+          <ChevronDown
+            size={16}
+            className={`text-slate-400 dark:text-zinc-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          />
+        </div>
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
+      >
+        <ul className="px-4 pb-4 space-y-2">
+          {project.bullets.map((bullet, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+              <span className="w-1 h-1 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+              {bullet}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export default function WorkExperience() {
+  const sectionRef = useScrollReveal();
+
   return (
     <div className="section-padding relative">
-      <div className="max-w-6xl mx-auto">
+      <div ref={sectionRef} className="max-w-6xl mx-auto reveal">
         {/* Header */}
         <div className="mb-16 text-center">
           <p className="section-subtitle mb-3">My Journey</p>
@@ -159,6 +261,16 @@ export default function WorkExperience() {
 
                   <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed mb-5">{exp.description}</p>
 
+                  {/* Project sub-items */}
+                  {exp.projects.length > 0 && (
+                    <div className="space-y-2 mb-5">
+                      <p className="text-xs font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Key Projects</p>
+                      {exp.projects.map((project) => (
+                        <ProjectDropdown key={project.name} project={project} />
+                      ))}
+                    </div>
+                  )}
+
                   <div className="flex flex-wrap gap-2">
                     {exp.highlights.map((h) => (
                       <span key={h} className="tag-indigo">{h}</span>
@@ -214,7 +326,7 @@ export default function WorkExperience() {
         </div>
 
         {/* ── Certifications ── */}
-        <div>
+        <div className="mb-16">
           <h3
             className="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -224,7 +336,7 @@ export default function WorkExperience() {
             >
               <Award size={18} style={{ color: "#c084fc" }} />
             </div>
-            Certifications &amp; Achievements
+            Certifications
           </h3>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -240,6 +352,42 @@ export default function WorkExperience() {
                   <Award size={16} style={{ color }} />
                 </div>
                 <p className="text-xs font-semibold text-slate-700 dark:text-zinc-300 leading-snug">{name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Achievements ── */}
+        <div>
+          <h3
+            className="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30"
+            >
+              <Award size={18} style={{ color: "#f59e0b" }} />
+            </div>
+            Achievements
+          </h3>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {achievements.map((achievement, i) => (
+              <div
+                key={i}
+                className="p-5 rounded-2xl glass glass-hover border border-slate-200 dark:border-white/10 flex items-start gap-3"
+              >
+                <span
+                  className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold"
+                  style={{
+                    background: `${["#818cf8", "#34d399", "#f59e0b"][i]}15`,
+                    color: ["#818cf8", "#34d399", "#f59e0b"][i],
+                    border: `1px solid ${["#818cf8", "#34d399", "#f59e0b"][i]}25`,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">{achievement}</p>
               </div>
             ))}
           </div>

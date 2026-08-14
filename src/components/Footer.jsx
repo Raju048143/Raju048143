@@ -2,7 +2,7 @@ import { Github, Linkedin, Mail, Heart, ArrowUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const socialLinks = [
-  { name: "GitHub", icon: Github, url: "https://github.com", accent: "#818cf8", hoverBg: "hover:bg-indigo-100 dark:hover:bg-indigo-500/20", hoverBorder: "hover:border-indigo-300 dark:hover:border-indigo-500/50", hoverText: "group-hover:text-indigo-600 dark:group-hover:text-indigo-400" },
+  { name: "GitHub", icon: Github, url: "https://github.com/Raju048143", accent: "#818cf8", hoverBg: "hover:bg-indigo-100 dark:hover:bg-indigo-500/20", hoverBorder: "hover:border-indigo-300 dark:hover:border-indigo-500/50", hoverText: "group-hover:text-indigo-600 dark:group-hover:text-indigo-400" },
   { name: "LinkedIn", icon: Linkedin, url: "https://www.linkedin.com/in/raju-yadav-946b16229/", accent: "#34d399", hoverBg: "hover:bg-teal-100 dark:hover:bg-teal-500/20", hoverBorder: "hover:border-teal-300 dark:hover:border-teal-500/50", hoverText: "group-hover:text-teal-600 dark:group-hover:text-teal-400" },
   { name: "Email", icon: Mail, url: "mailto:rajuyadav91391@gmail.com", accent: "#c084fc", hoverBg: "hover:bg-purple-100 dark:hover:bg-purple-500/20", hoverBorder: "hover:border-purple-300 dark:hover:border-purple-500/50", hoverText: "group-hover:text-purple-600 dark:group-hover:text-purple-400" },
 ];
@@ -70,7 +70,7 @@ export default function Footer() {
                 </span>
               </div>
               <p className="text-slate-600 dark:text-zinc-400 text-sm leading-relaxed max-w-xs mb-6">
-                Full Stack Software Developer specializing in MERN stack applications with a passion for scalable, production-grade code.
+                Full-Stack Developer (MERN) building production-grade applications serving 6,000+ users across multiple live platforms.
               </p>
               {/* Socials */}
               <div className="flex gap-3">
